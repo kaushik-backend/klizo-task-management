@@ -1,0 +1,15 @@
+module.exports = [
+  "user:create",
+  "user:read",
+  "user:update",
+  "user:delete",
+  "role:create",
+  "role:read",
+  "role:update",
+  "role:delete",
+  "role:assign",
+  "permission:create",
+  "permission:read",
+  "permission:update",
+  "permission:delete",
+];

@@ -1,0 +1,21 @@
+projectId,title,description,type,parentTaskId,epicId,assigneeId,reporterId,priority,status
+68875ec7aa69dbea8d0f2dba,Issue 1,Description for Issue 1,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 2,Description for Issue 2,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 3,Description for Issue 3,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
+68875ec7aa69dbea8d0f2dba,Issue 4,Description for Issue 4,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 5,Description for Issue 5,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 6,Description for Issue 6,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
+68875ec7aa69dbea8d0f2dba,Issue 7,Description for Issue 7,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 8,Description for Issue 8,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 9,Description for Issue 9,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 10,Description for Issue 10,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
+68875ec7aa69dbea8d0f2dba,Issue 11,Description for Issue 11,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 12,Description for Issue 12,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
+68875ec7aa69dbea8d0f2dba,Issue 13,Description for Issue 13,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 14,Description for Issue 14,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 15,Description for Issue 15,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 16,Description for Issue 16,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
+68875ec7aa69dbea8d0f2dba,Issue 17,Description for Issue 17,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 18,Description for Issue 18,task,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,medium,backlog
+68875ec7aa69dbea8d0f2dba,Issue 19,Description for Issue 19,bug,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,high,backlog
+68875ec7aa69dbea8d0f2dba,Issue 20,Description for Issue 20,story,,,686cc6cf2d923004a8001902,6865128178adc279ba0c4c13,low,backlog
