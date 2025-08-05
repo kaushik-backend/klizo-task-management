@@ -1,16 +1,15 @@
-# Klizo Attendance Monitoring System - Backend API
+# Klizo Task Management System - Backend API
 
-A comprehensive Node.js/Express backend for employee attendance monitoring, productivity tracking, and analytics.
+A comprehensive Node.js/Express backend for project and task management
 
 ## Features
 
-- **Authentication & Authorization**: JWT-based authentication with role-based access control
-- **Activity Monitoring**: Track user activity, applications, and window titles
-- **Screenshot Capture**: Automated screenshot capture with privacy controls
-- **Screen Recording**: Video recording with compression and thumbnail generation
-- **Analytics**: Comprehensive productivity analytics and reporting
-- **Multi-tenant**: Organization-based data isolation
-- **Real-time Processing**: Background video compression and analytics
+- **Authentication & Authorization**: JWT-based authentication and authorization from base project Attendance Software
+
+- **Project Creation**: User can create project based on his access permission
+- **Issue Creation**: User can create Issues of associated project
+- **Sprint Creation**: User can create Sprint add issues time log tasks
+- **Reporting**: User can get analytical view of efficiency and completion
 - **API Documentation**: Complete Swagger/OpenAPI documentation
 
 ## Prerequisites
@@ -18,7 +17,7 @@ A comprehensive Node.js/Express backend for employee attendance monitoring, prod
 - Node.js 18+ 
 - MongoDB 5.0+
 - Redis 6.0+ (optional, for caching)
-- FFmpeg (for video compression)
+- multer
 
 ## Installation
 
@@ -39,12 +38,7 @@ A comprehensive Node.js/Express backend for employee attendance monitoring, prod
    # Edit .env with your configuration
    ```
 
-4. **Install FFmpeg** (for video compression)
-   - **Windows**: Download from https://ffmpeg.org/download.html
-   - **macOS**: `brew install ffmpeg`
-   - **Linux**: `sudo apt install ffmpeg`
-
-5. **Start the server**
+4. **Start the server**
    ```bash
    npm start
    ```
@@ -62,7 +56,7 @@ NODE_ENV=development
 JWT_SECRET=your-super-secret-jwt-key-here
 
 # Database Configuration
-MONGODB_URI=mongodb://localhost:27017/klizo_monitor
+MONGODB_URI=mongodb://localhost:27017/task-management
 
 # Redis Configuration (Optional)
 REDIS_URL=redis://localhost:6379
@@ -72,6 +66,7 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:300
 
 # File Upload Configuration
 MAX_FILE_SIZE=50mb
+MAX_FILE_COUNT=10
 UPLOAD_PATH=./uploads
 ```
 
@@ -82,13 +77,13 @@ UPLOAD_PATH=./uploads
 The API documentation is available through Swagger UI at:
 
 ```
-http://localhost:3000/api-docs
+http://localhost:8080/api-docs
 ```
 
 **Features:**
 - Interactive API documentation
 - Try out endpoints directly from the browser
-- Authentication support (JWT Bearer token)
+- Authentication support from Attednace Software and REST api communication
 - Request/response examples
 - Schema definitions for all data models
 
@@ -96,57 +91,49 @@ http://localhost:3000/api-docs
 
 The API is organized into the following categories:
 
-#### Authentication (`/api/auth`)
-- `POST /register` - Register new user
-- `POST /login` - User login
-- `POST /refresh` - Refresh JWT token
-- `POST /logout` - User logout
-- `GET /profile` - Get user profile
-- `POST /forgot-password` - Request password reset
-- `POST /reset-password` - Reset password
+#### PROJECT (`/api/projects`)
+- `POST /` - Create a new project
+- `GET /{id}` - Get specific project by id
+- `PUT /{id}` - Update project by id
+- `DELETE /{id}` - Soft delete project by id
+- `PATCH /{id}` - Add/Remove members from the project
+- `GET /{id}` - Get project analytics
 
-#### Monitoring (`/api/monitoring`)
-- `POST /activity-logs` - Create activity log
-- `GET /activity-logs` - Get activity logs
-- `POST /screenshots` - Upload screenshot
-- `GET /screenshots` - Get screenshots
-- `POST /recordings` - Upload recording
-- `GET /recordings` - Get recordings
-- `POST /idle-status` - Update idle status
+#### Issues (`/api/issues`)
+- `POST /` - Create a new Issue(task,story,epic,subtask,bug)
+- `POST /bulk-create` - Create a new Issue(task,story,epic,subtask,bug)
+- `GET /{projectId}` - Get all issues for a specific project
+- `PUT /{issueId}` - Update an issue's details
+- `DELETE /{issueId}` - Soft delete an issue
+- `PUT /{issueId}/status` - Update the status of an issue 
 
-#### Analytics (`/api/analytics`)
-- `GET /productivity` - Get productivity analytics
-- `GET /trends` - Get productivity trends
-- `GET /applications` - Get application usage
-- `GET /time-tracking` - Get time tracking data
-- `GET /reports` - Generate comprehensive reports
+#### Sprints (`/api/sprints`)
+- `POST /` - Create a new sprint for a project
+- `PUT /add-to-sprint/{issueId}` - Add an issue to a sprint and update its status to to_do
+- `PUT /start-sprint/{sprintId}` - Start a sprint
+- `POST /end-sprint/{sprintId}` - End a sprint and mark associated issues
+- `POST /time-log/stop` - Stop time logging on an issue
+- `GET /{sprintId}/issues` - Get isssues of a specific sprint
+- `GET /{sprintId}/time-logs` - Get time logs of a specific sprint
+- `POST /{sprintId}/time-log/start` - Start time loggin on an issue
 
-#### Compression (`/api/compression`)
-- `GET /status` - Get compression worker status
-- `POST /start` - Start compression worker
-- `POST /stop` - Stop compression worker
-- `POST /retry` - Retry failed compressions
-- `POST /cleanup` - Clean up old files
+## Users (`/api/user`)
+- `GET /search-employees` - Search employees by name or email
 
-## Authentication
 
-The API uses JWT (JSON Web Tokens) for authentication:
-
-1. **Login** to get a token:
+1. **Login** to get a token: -- fetch access token from attendance software
    ```bash
    POST /api/auth/login
    {
-     "email": "user@example.com",
+     "email": "kaushik@klizos.com",
      "password": "password123"
    }
    ```
 
-2. **Use the token** in subsequent requests:
-   ```bash
-   Authorization: Bearer <your-jwt-token>
+2. **Use the token** in  fetchEmployee service
    ```
 
-## Role-Based Access Control
+## Role-Based Access Control -- will be managed from attendance software
 
 The system supports three user roles:
 
@@ -156,57 +143,12 @@ The system supports three user roles:
 
 ## Data Models
 
-### User
-- Personal information (name, email, etc.)
-- Role and permissions
-- Organization association
-- Activity tracking
-
-### Organization
-- Company information
-- Settings and features
-- User limits and configurations
-
-### ActivityLog
-- Application usage
-- Window titles
-- Time tracking
-- Productivity scoring
-
-### Screenshot
-- Image files
-- Metadata (application, window title)
-- Privacy controls
-- Organization isolation
-
-### Recording
-- Video files
-- Compression status
-- Thumbnails
-- Quality settings
 
 ## File Upload
 
-The system handles file uploads for screenshots and recordings:
-
-- **Screenshots**: JPEG/PNG images (max 50MB)
-- **Recordings**: Video files (max 50MB)
-- **Automatic compression**: Videos are compressed in the background
-- **Organization isolation**: Files are stored per organization
+The system handles file uploads for issue attachments:
 
 ## Analytics
-
-### Productivity Metrics
-- Active time vs idle time
-- Application usage patterns
-- Productivity scoring algorithm
-- Trend analysis
-
-### Reporting
-- Daily/weekly/monthly reports
-- Team and organization analytics
-- Export capabilities (JSON, CSV, PDF)
-- Real-time dashboards
 
 ## Security Features
 
@@ -223,7 +165,6 @@ The system handles file uploads for screenshots and recordings:
 - **Database Indexing**: Optimized queries
 - **Redis Caching**: Optional caching layer
 - **Background Processing**: Non-blocking operations
-- **File Compression**: Automatic video optimization
 - **Pagination**: Efficient data retrieval
 
 ## Development
@@ -246,7 +187,6 @@ npm start          # Start production server
 npm run dev        # Start development server with nodemon
 npm test           # Run tests
 npm run lint       # Run ESLint
-npm run migrate    # Run database migrations
 ```
 
 ### Testing
@@ -278,24 +218,7 @@ docker build -t klizo-backend .
 docker run -p 3000:3000 --env-file .env klizo-backend
 ```
 
-## Monitoring & Logging
 
-The system uses Winston for logging with configurable levels:
-- **Error**: Application errors and exceptions
-- **Warn**: Warning messages
-- **Info**: General information
-- **Debug**: Detailed debugging information
-
-## Support
-
-For support and questions:
-- **Documentation**: Check the Swagger UI at `/api-docs`
-- **Issues**: Create an issue in the repository
-- **Email**: support@klizo.com
-
-## License
-
-MIT License - see LICENSE file for details.
 
 ## Contributing
 
