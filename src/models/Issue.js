@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose= require("mongoose");
 
 const IssueSchema = new mongoose.Schema({
@@ -10,8 +11,8 @@ const IssueSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   type: { type: String, required: true }, // example values ['task', 'story', 'epic', 'subtask', 'bug','feedback'] dynamic for now
-  parentTaskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' },
-  epicId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue' },
+  parentTaskId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue', required:false,default:null },
+  epicId: { type: mongoose.Schema.Types.ObjectId, ref: 'Issue',required:false,default:null },
   status: { type: String, enum: ['backlog', 'to_do', 'in_progress','in_review','in_testing','done'], default: 'backlog' },
   assigneeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
   reporterId: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },

@@ -65,10 +65,10 @@
     "supertest": "^6.3.4"
   },
   "keywords": [
-    "monitoring",
-    "attendance",
+    "tasks",
+    "projects",
     "productivity",
-    "employee-tracking",
+    "efficiency",
     "api"
   ],
   "author": "Klizo Team",

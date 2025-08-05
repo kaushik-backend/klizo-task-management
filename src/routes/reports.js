@@ -4,33 +4,6 @@ const Sprint = require("../models/Sprint");
 const Issue = require("../models/Issue");
 const Project = require("../models/Project");
 
-// Burndown chart route
-router.get('/burndown', async (req, res) => {
-  try {
-    const { sprintId } = req.query;
-    if (!sprintId) {
-      return res.status(400).json({ message: "Sprint ID is required" });
-    }
-
-    // Fetch sprint data
-    const sprint = await Sprint.findById(sprintId).populate("issues").populate("timeLogs");
-    if (!sprint) {
-      return res.status(404).json({ message: "Sprint not found" });
-    }
-
-    // Fetch issues related to the sprint
-    const issues = sprint.issues;
-
-    // Calculate burndown data
-    const burndownData = await calculateBurndownData(issues, sprint);
-
-    res.json({ burndownData });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
-
 router.get('/pie-chart', async (req, res) => {
   try {
     const { projectId } = req.query;
@@ -99,6 +72,32 @@ router.get('/created-vs-resolved', async (req, res) => {
   }
 });
 
+// Burndown chart route
+router.get('/burndown', async (req, res) => {
+  try {
+    const { sprintId } = req.query;
+    if (!sprintId) {
+      return res.status(400).json({ message: "Sprint ID is required" });
+    }
+
+    // Fetch sprint data
+    const sprint = await Sprint.findById(sprintId).populate("issues").populate("timeLogs");
+    if (!sprint) {
+      return res.status(404).json({ message: "Sprint not found" });
+    }
+
+    // Fetch issues related to the sprint
+    const issues = sprint.issues;
+
+    // Calculate burndown data
+    const burndownData = await calculateBurndownData(issues, sprint);
+
+    res.json({ burndownData });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
 
 async function calculateBurndownData(issues, sprint) {
   let totalWork = 0;

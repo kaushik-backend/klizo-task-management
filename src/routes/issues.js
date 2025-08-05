@@ -8,6 +8,7 @@ const {setSuccessResponse} = require("../utils/sendResponse");
 const { StatusCodes } = require('http-status-codes');
 const mongoose= require("mongoose");
 const { upload, parseCSV } = require('../middleware/csvUploadMiddleware');
+const uploadFiles = require('../middleware/uploadFiles');
 
 // Create Issue Route
 /**
@@ -21,7 +22,7 @@ const { upload, parseCSV } = require('../middleware/csvUploadMiddleware');
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:  # Switch to form-data for Swagger
  *           schema:
  *             type: object
  *             required:
@@ -53,10 +54,12 @@ const { upload, parseCSV } = require('../middleware/csvUploadMiddleware');
  *                 example: "bug"
  *               parentTaskId:
  *                 type: string
+ *                 nullable: true  # Allow null for parentTaskId
  *                 description: The ID of the parent task (optional, for subtasks)
  *                 example: "608d1f23058f8a0a94aee530"
  *               epicId:
  *                 type: string
+ *                 nullable: true  # Allow null for epicId
  *                 description: The ID of the epic this issue belongs to (optional)
  *                 example: "608d1f23058f8a0a94aee531"
  *               assigneeId:
@@ -191,7 +194,9 @@ const { upload, parseCSV } = require('../middleware/csvUploadMiddleware');
  */
 router.post(
   '/',
+  uploadFiles,
   [
+  // Validate form fields
     body('projectId').isMongoId().withMessage('Valid projectId is required'),
     body('title').notEmpty().withMessage('Title is required'),
     body('description').notEmpty().withMessage('Description is required'),
@@ -206,9 +211,18 @@ router.post(
       return res.status(400).json({ success: false, errors: errors.array() });
     }
 
+    // Convert empty strings to null directly in req.body
+    if (req.body.parentTaskId === "") req.body.parentTaskId = null;
+    if (req.body.epicId === "") req.body.epicId = null;
+
     const { projectId, title, description, type, parentTaskId, epicId, assigneeId, reporterId, priority,priorityLevel } = req.body;
 
     try {
+        // check for duplicate issues
+        const existingIssue = await Issue.findOne({title:title,projectId:projectId});
+        if(existingIssue){
+          return res.status(409).json({success:false, message:"Issue already exists for the same project"});
+        }
         // check if project exists
         const project= await Project.findById(projectId);
         if(!project){
@@ -248,8 +262,10 @@ router.post(
       }
 
        const lastIssue = await Issue.find({ projectId }).sort({ issueNumber: -1 }).limit(1);
-       console.log("=======last-issue========",lastIssue);
     const nextIssueNumber = lastIssue.length > 0 ? lastIssue[0].issueNumber + 1 : 1;
+
+    // handle file attachments
+    const attachmentUrls = req.files ? req.files.map(file => file.path) : [];
       const issue = new Issue({
         projectId,
         title,
@@ -261,7 +277,8 @@ router.post(
         assigneeId,
         reporterId,
         priority,
-        priorityLevel
+        priorityLevel,
+        attachments: attachmentUrls,
       });
 
       issue.key = `${project.name.slice(0, 3).toUpperCase()}-${issue.issueNumber}`;
@@ -378,7 +395,7 @@ router.post("/bulk-create", upload, async (req, res) => {
 
     // Parse the CSV file to get issue data
     const issues = await parseCSV(req.file.path);
-    console.log("========issues from CSV=============", issues);
+    // console.log("========issues from CSV=============", issues);
 
     const createdIssues = [];
     
@@ -400,7 +417,6 @@ router.post("/bulk-create", upload, async (req, res) => {
         parentId = null,
         priorityLevel = 'Major',
         progress = 0,
-        issueNumber = 1,
       } = issueData;
 
       // Validate project
@@ -430,9 +446,17 @@ router.post("/bulk-create", upload, async (req, res) => {
         return res.status(400).json({ success: false, message: "Assignee and Reporter cannot be the same" });
       }
 
-      // Create new issue based on CSV data
+      // Get the latest issue number for the project
+      const latestIssue = await Issue.findOne({ projectId }).sort({ issueNumber: -1 }).exec();
+      const issueNumber = latestIssue ? latestIssue.issueNumber + 1 : 1; // Start at 1 if no issues exist
+
+      // Generate the issue key based on the project and issue number
+      const projectKey = project.name.slice(0, 3).toUpperCase();  // Example: "PRO"
+      const key = `${projectKey}-${issueNumber}`;
+
+      // Create new issue based on CSV data and generate key
       const issue = new Issue({
-        key: `${project.name.slice(0, 3).toUpperCase()}-${issueNumber}`,  // Creating unique key like 'PRO-1'
+        key, // Assign dynamically generated key
         projectId,
         title,
         description,

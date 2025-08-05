@@ -1200,4 +1200,29 @@ router.get('/:sprintId/issues-by-status', async (req, res) => {
   }
 });
 
+// get sprint issues grouped by status 
+router.get("/board/:sprintId", async(req,res)=>{
+  try{
+   const { sprintId } = req.params;
+
+    const issues = await Issue.find({ sprint: sprintId })
+      .populate("assignee", "name email")
+      .populate("reporter", "name email");
+
+    const grouped = {
+      "To Do": [],
+      "In Progress": [],
+      Done: [],
+    };
+
+    for (const issue of issues) {
+      grouped[issue.status]?.push(issue);
+    }
+
+    res.json(grouped);
+  }catch(err){
+       res.status(500).json({ error: err.message });
+  }
+})
+
 module.exports = router;
